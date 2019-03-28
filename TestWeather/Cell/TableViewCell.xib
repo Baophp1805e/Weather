@@ -58,6 +58,7 @@
                     <constraint firstItem="pZO-uk-FGg" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="10" id="qYC-ra-3jr"/>
                 </constraints>
             </tableViewCellContentView>
+            <color key="backgroundColor" red="0.62868914646280183" green="0.63669240756464129" blue="0.68414022020725396" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="lblDay" destination="pZO-uk-FGg" id="oCV-Fu-D0D"/>

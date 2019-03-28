@@ -25,4 +25,10 @@ class TableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    func bindData(wether:Weather) {
+        lblDay.text = wether.day
+        lblTime.text = wether.time
+        lblTemp.text = wether.temp
+    }
+    
 }
