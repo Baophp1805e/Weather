@@ -14,6 +14,9 @@ struct Weather {
     var time:String?
     var temp:String?
     var main:String?
+    var tempMin:String?
+    var temMax:String?
+    
     
     init(day:String, time:String, temp:String) {
         self.day = day
@@ -27,11 +30,19 @@ struct Weather {
         self.name = name
     }
     
+    init(day:String, main:String, tempMin:String, temMax:String) {
+        self.day = day
+        self.main = main
+        self.tempMin = tempMin
+        self.temMax = temMax
+    }
+    
     init() {
         self.day = ""
         self.main = ""
         self.temp = ""
         self.name = ""
     }
+    
 }
 

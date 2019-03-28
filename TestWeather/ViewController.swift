@@ -16,42 +16,88 @@ class ViewController: UIViewController, UISearchBarDelegate {
     //MARK:Property
     @IBOutlet weak var imgSun: UIImageView!
     @IBOutlet weak var lblPlace: UILabel!
+    @IBOutlet weak var imgMain: UIImageView!
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var lblTime: UILabel!
     @IBOutlet weak var lblClounds: UILabel!
     @IBOutlet weak var lblTemp: UILabel!
     @IBOutlet weak var searchBar: UISearchBar!
-    
+    var weatherModel: Weather?
 //    let id = 1562822
 //    let apiKey = "8c1e240150949fb7bfe0bf0503c8a20e"
     var weather = [Weather]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        tableView.headerView(forSection: 1)
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
         // Do any additional setup after loading the view, typically from a nib.
         tableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "tempCell")
-        
+//        updateImage()
+       request(city: "Ha Noi")
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        Helper.requestAPI(city: searchText) { [ weak self] weather in
+        request(city: searchText)
+    }
+    
+    func request(city:String){
+        Helper.requestAPI(city: city) { [ weak self] weather in
             DispatchQueue.main.async {
                 self!.lblTime.text = weather.day
                 self!.lblPlace.text = weather.name
                 self!.lblClounds.text = weather.main
+                self!.updateImage(text: weather.main!)
+                
                 self!.lblTemp.text = weather.temp! + " °C"
             }
         }
-        Helper.fetchJson(city: searchText) { [weak self] weatherList in
+        Helper.fetchJson(city: city) { [weak self] weatherList in
             self?.weather = weatherList
             DispatchQueue.main.async {
                 self?.tableView.reloadData()
             }
         }
+//        Helper.fetchDay(city: city) { [weak self] weatherDay in
+//            self?.weather = weatherDay
+//            DispatchQueue.main.async {
+//                self?.tableView.reloadData()
+//            }
+//        }
     }
+    
+    func updateImage(text:String) {
+        switch text {
+        case "Sunny":
+            self.imgMain.image = UIImage(named: "sunny")
+//            break
+        case "Clear":
+            self.imgMain.image = UIImage(named: "sunny")
+//            break
+        case "Clouds":
+            self.imgMain.image = UIImage(named: "cloudy2")
+        case "Rain":
+            self.imgMain.image = UIImage(named: "light_rain")
+        case "Thunder":
+            self.imgMain.image = UIImage(named: "storm1")
+        case "Thunderstorm":
+            self.imgMain.image = UIImage(named: "storm2")
+        case "Snow":
+            self.imgMain.image = UIImage(named: "snow4")
+        case "Fog":
+            self.imgMain.image = UIImage(named: "fog")
+        case "Mist":
+            self.imgMain.image = UIImage(named: "fog")
+        case "Haze":
+            self.imgMain.image = UIImage(named: "fog")
+//            break
+        default:
+            self.imgMain.image = UIImage(named: "don't_know")
+        }
+    }
+    
 }
 
 extension ViewController:UITableViewDelegate, UITableViewDataSource {
