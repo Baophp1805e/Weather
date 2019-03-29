@@ -9,8 +9,9 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
+import NVActivityIndicatorView
 
-class DaysViewController: UIViewController, UISearchBarDelegate {
+class DaysViewController: UIViewController, UISearchBarDelegate, NVActivityIndicatorViewable {
     
     var weatherList = [Weather]()
     
@@ -24,9 +25,25 @@ class DaysViewController: UIViewController, UISearchBarDelegate {
         searchBar.delegate = self
         // Do any additional setup after loading the view.
         tableView.register(UINib(nibName: "DayTableViewCell", bundle: nil), forCellReuseIdentifier: "dayCell")
+        getCity(city: "Ha Noi")
+//        activityIndicatorView.startAnimating()
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        Helper.fetchDay(city: searchText) { [weak self] weatherDay in
+        if !searchText.isEmpty{
+            getCity(city: searchText)
+        } else {
+            getCity(city: "Ha Noi")
+        }
+        
+        
+    }
+    
+    func customTable(){
+//        NVActivityIndicatorView(frame: frame, type: type, color: color, padding: padding)
+    }
+    
+    func getCity(city: String){
+        Helper.fetchDay(city: city) { [weak self] weatherDay in
             self?.weatherList = weatherDay
             DispatchQueue.main.async {
                 self?.tableView.reloadData()
@@ -52,5 +69,14 @@ extension DaysViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 150
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if tableView.isDragging {
+            cell.transform = CGAffineTransform.init(scaleX: 0.5, y: 0.5)
+            UIView.animate(withDuration: 0.3, animations: {
+                cell.transform = CGAffineTransform.identity
+            })
+        }
     }
 }

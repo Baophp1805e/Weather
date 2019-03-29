@@ -18,10 +18,11 @@ struct Weather {
     var temMax:String?
     
     
-    init(day:String, time:String, temp:String) {
+    init(day:String, main: String ,time:String, temp:String) {
         self.day = day
         self.time = time
         self.temp = temp
+        self.main = main
     }
     init(day:String, main:String, temp:String, name:String) {
         self.day = day

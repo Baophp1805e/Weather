@@ -66,6 +66,7 @@ class Helper {
                         let data = jsonResponse["list"]
                         //                                            print(data)
                         data.array?.forEach({ (daily) in
+                            let weatherJson = daily["weather"].array![0]
                             let date = Date(timeIntervalSince1970: daily["dt"].doubleValue)
                             let dateFormatter = DateFormatter()
                             dateFormatter.dateFormat = "EEEE"
@@ -73,7 +74,7 @@ class Helper {
                             let calendar = Calendar.current
                             _ = calendar.component(.hour, from: date)
                             
-                            let dailyModel = Weather(day: dateFormatter.string(from: date), time: daily["dt_txt"].stringValue, temp: main["temp"].stringValue)
+                            let dailyModel = Weather(day: dateFormatter.string(from: date),main: weatherJson["main"].stringValue, time: daily["dt_txt"].stringValue, temp: main["temp"].stringValue)
                             let current_date = Date()
                             _ = calendar.component(.hour, from: current_date)
                             weatherList.append(dailyModel)

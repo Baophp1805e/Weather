@@ -4,5 +4,6 @@
 target 'TestWeather' do
 	pod 'Alamofire', '~> 4.5'
 	pod 'SwiftyJSON'
+  pod 'NVActivityIndicatorView'
 
 end

@@ -9,15 +9,17 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
+import NVActivityIndicatorView
 //import CoreLocation
 
-class ViewController: UIViewController, UISearchBarDelegate {
+class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicatorViewable {
     
     //MARK:Property
     @IBOutlet weak var imgSun: UIImageView!
     @IBOutlet weak var lblPlace: UILabel!
     @IBOutlet weak var imgMain: UIImageView!
     
+    @IBOutlet weak var lblError: UILabel!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var lblTime: UILabel!
     @IBOutlet weak var lblClounds: UILabel!
@@ -36,14 +38,23 @@ class ViewController: UIViewController, UISearchBarDelegate {
         searchBar.delegate = self
         // Do any additional setup after loading the view, typically from a nib.
         tableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "tempCell")
-//        updateImage()
-       request(city: "Ha Noi")
+        //        updateImage()
+        request(city: "Ha Noi")
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        request(city: searchText)
+        if !searchText.isEmpty {
+            request(city: searchText)
+        } else {
+            request(city: "Ha Noi")
+        }
+        
     }
     
+    
     func request(city:String){
+        
+        let size = CGSize(width: 30, height: 30)
+        self.startAnimating(size, message: "Loading", type: NVActivityIndicatorType.ballRotateChase, fadeInAnimation: nil)
         Helper.requestAPI(city: city) { [ weak self] weather in
             DispatchQueue.main.async {
                 self!.lblTime.text = weather.day
@@ -66,6 +77,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
 //                self?.tableView.reloadData()
 //            }
 //        }
+        self.stopAnimating()
     }
     
     func updateImage(text:String) {
@@ -115,5 +127,14 @@ extension ViewController:UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 90
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if tableView.isDragging {
+            cell.transform = CGAffineTransform.init(scaleX: 0.5, y: 0.5)
+            UIView.animate(withDuration: 0.3, animations: {
+                cell.transform = CGAffineTransform.identity
+            })
+        }
     }
 }
