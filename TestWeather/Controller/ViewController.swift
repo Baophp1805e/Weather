@@ -18,6 +18,7 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
     @IBOutlet weak var imgSun: UIImageView!
     @IBOutlet weak var lblPlace: UILabel!
     @IBOutlet weak var imgMain: UIImageView!
+    @IBOutlet weak var currentTime: UILabel!
     
     @IBOutlet weak var lblError: UILabel!
     @IBOutlet weak var tableView: UITableView!
@@ -40,6 +41,11 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
         tableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "tempCell")
         //        updateImage()
         request(city: "Ha Noi")
+        let date = Date()
+        let format = DateFormatter()
+        format.dateFormat = "yyyy-MM-dd HH:mm"
+        let formattedDate = format.string(from: date)
+        currentTime.text = formattedDate
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if !searchText.isEmpty {

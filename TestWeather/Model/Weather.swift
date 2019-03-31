@@ -9,13 +9,14 @@
 import Foundation
 
 struct Weather {
-    var name:String?
-    var day:String?
-    var time:String?
-    var temp:String?
-    var main:String?
-    var tempMin:String?
-    var temMax:String?
+    var name: String?
+    var day: String?
+    var time: String?
+    var temp: String?
+    var main: String?
+    var tempMin: String?
+    var temMax: String?
+    var timeStamp: String?
     
     
     init(day:String, main: String ,time:String, temp:String) {
