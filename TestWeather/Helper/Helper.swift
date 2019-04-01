@@ -12,7 +12,7 @@ import SwiftyJSON
 
 class Helper {
     
-    class func requestAPI(city: String, completion: @escaping(Weather) -> Swift.Void) {
+    class func callAPI(city: String, completion: @escaping(Bool, Weather) -> Swift.Void) {
         let apiKey = "8c1e240150949fb7bfe0bf0503c8a20e"
         if let c = city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
             let url = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=\(c)&appid=\(apiKey)&units=metric")!
@@ -33,23 +33,23 @@ class Helper {
                             let dateFormatter = DateFormatter()
                             dateFormatter.dateFormat = "EEEE"
                             let dailyModel = Weather(day: dateFormatter.string(from: date) , main: jsonWeather["main"].stringValue, temp:"\(Int(round(jsonTemp["temp"].doubleValue)))", name: jsonResponse["name"].stringValue)
-                            completion(dailyModel)
+                            completion(true, dailyModel)
                         } else {
                             let dailyModel = Weather()
-                            completion(dailyModel)
+                            completion(false, dailyModel)
                         }
                         
                     }
                 case .failure(let error):
                     let dailyModel = Weather()
-                    completion(dailyModel)
+                    completion(false, dailyModel)
                     print(error.localizedDescription)
                 }
             }
         }
     }
     
-    class func fetchJson(city: String, completion: @escaping([Weather]) -> Swift.Void){
+    class func fetchJson(city: String, completion: @escaping(Bool, [Weather]) -> Swift.Void){
         var weatherList = [Weather]()
         let apiKey = "8c1e240150949fb7bfe0bf0503c8a20e"
         if let ct = city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
@@ -59,36 +59,39 @@ class Helper {
             switch response.result{
             //_ = let value
             case .success( _):
-                    //                    let json = JSON(value)
-                    if let responseStr = response.result.value {
-                        let jsonResponse = JSON(responseStr)
-                        //                        print(jsonResponse)
-                        let data = jsonResponse["list"]
-                        //                                            print(data)
-                        data.array?.forEach({ (daily) in
-                            let weatherJson = daily["weather"].array![0]
-                            let date = Date(timeIntervalSince1970: daily["dt"].doubleValue)
-                            let dateFormatter = DateFormatter()
-                            dateFormatter.dateFormat = "EEEE"
-                            let main = daily["main"]
-                            let calendar = Calendar.current
-                            _ = calendar.component(.hour, from: date)
-                            
-                            let dailyModel = Weather(day: dateFormatter.string(from: date),main: weatherJson["main"].stringValue, time: daily["dt_txt"].stringValue, temp: main["temp"].stringValue)
-                            let current_date = Date()
-                            _ = calendar.component(.hour, from: current_date)
-                            weatherList.append(dailyModel)
-                        })
-                        completion(weatherList)
+                //                    let json = JSON(value)
+                if let responseStr = response.result.value {
+                    let jsonResponse = JSON(responseStr)
+                    //                        print(jsonResponse)
+                    let data = jsonResponse["list"]
+                    //                                            print(data)
+                    data.array?.forEach({ (daily) in
+                        let weatherJson = daily["weather"].array![0]
+                        let date = Date(timeIntervalSince1970: daily["dt"].doubleValue)
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "EEEE"
+                        let main = daily["main"]
+                        let calendar = Calendar.current
+                        _ = calendar.component(.hour, from: date)
+                        
+                        let dailyModel = Weather(day: dateFormatter.string(from: date),main: weatherJson["main"].stringValue, time: daily["dt_txt"].stringValue, temp: main["temp"].stringValue)
+                        let current_date = Date()
+                        _ = calendar.component(.hour, from: current_date)
+                        weatherList.append(dailyModel)
+                    })
+                    completion(true, weatherList)
+                } else {
+                    completion(false, [Weather]())
                 }
             case .failure(let error):
                 print(error.localizedDescription)
+                completion(false, [Weather]())
             }
             }
         }
     }
     
-    class func fetchDay(city: String, completion: @escaping ([Weather]) -> Swift.Void)  {
+    class func fetchDay(city: String, completion: @escaping (Bool, [Weather]) -> Swift.Void)  {
         var dayList = [Weather]()
         let apiKey = "8c1e240150949fb7bfe0bf0503c8a20e"
         if let ct = city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
@@ -115,10 +118,14 @@ class Helper {
                             print(weather)
                             dayList.append(weather)
                         })
-                        completion(dayList)
+                        completion(true, dayList)
+                    }
+                    else {
+                        completion(false, [Weather]())
                     }
                 case .failure(let error):
-                     print(error.localizedDescription)
+                    print(error.localizedDescription)
+                    completion(false, [Weather]())
                 }
             }
         }

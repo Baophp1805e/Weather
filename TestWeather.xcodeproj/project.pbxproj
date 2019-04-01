@@ -21,6 +21,7 @@
 		399B497E224C6BE300F4E268 /* DayTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 399B497C224C6BE300F4E268 /* DayTableViewCell.swift */; };
 		399B497F224C6BE300F4E268 /* DayTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 399B497D224C6BE300F4E268 /* DayTableViewCell.xib */; };
 		399B4981224C719300F4E268 /* DaysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 399B4980224C719300F4E268 /* DaysViewController.swift */; };
+		39A5E1CA22519C0F00266996 /* checkingInternet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A5E1C922519C0F00266996 /* checkingInternet.swift */; };
 		A33872E4771F21A179756337 /* libPods-TestWeather.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C3E0574141020836D988EFC /* libPods-TestWeather.a */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +63,7 @@
 		399B497C224C6BE300F4E268 /* DayTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTableViewCell.swift; sourceTree = "<group>"; };
 		399B497D224C6BE300F4E268 /* DayTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DayTableViewCell.xib; sourceTree = "<group>"; };
 		399B4980224C719300F4E268 /* DaysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaysViewController.swift; sourceTree = "<group>"; };
+		39A5E1C922519C0F00266996 /* checkingInternet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = checkingInternet.swift; sourceTree = "<group>"; };
 		5C3E0574141020836D988EFC /* libPods-TestWeather.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TestWeather.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0A1F32A8007D54611536D12 /* Pods-TestWeather.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestWeather.release.xcconfig"; path = "Target Support Files/Pods-TestWeather/Pods-TestWeather.release.xcconfig"; sourceTree = "<group>"; };
 		E21FEF85F7BEF9C5535DE957 /* Pods-TestWeather.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestWeather.debug.xcconfig"; path = "Target Support Files/Pods-TestWeather/Pods-TestWeather.debug.xcconfig"; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				39083CEE224B2D8E007D0B01 /* Helper.swift */,
+				39A5E1C922519C0F00266996 /* checkingInternet.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -383,6 +386,7 @@
 				39083CEF224B2D8E007D0B01 /* Helper.swift in Sources */,
 				39796C9E22447B9B0036A111 /* Weather.swift in Sources */,
 				399B497E224C6BE300F4E268 /* DayTableViewCell.swift in Sources */,
+				39A5E1CA22519C0F00266996 /* checkingInternet.swift in Sources */,
 				3931CA532243484400BEF689 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

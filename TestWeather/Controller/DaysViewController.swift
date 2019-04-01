@@ -17,6 +17,7 @@ class DaysViewController: UIViewController, UISearchBarDelegate, NVActivityIndic
     
     @IBOutlet weak var searchBar: UISearchBar!
     
+    @IBOutlet weak var lblError: UILabel!
     @IBOutlet weak var tableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +26,7 @@ class DaysViewController: UIViewController, UISearchBarDelegate, NVActivityIndic
         searchBar.delegate = self
         // Do any additional setup after loading the view.
         tableView.register(UINib(nibName: "DayTableViewCell", bundle: nil), forCellReuseIdentifier: "dayCell")
-        getCity(city: "Ha Noi")
+//        getCity(city: "Ha Noi")
 //        activityIndicatorView.startAnimating()
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -34,8 +35,23 @@ class DaysViewController: UIViewController, UISearchBarDelegate, NVActivityIndic
         } else {
             getCity(city: "Ha Noi")
         }
-        
-        
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        let _ = Connectivity.isConnectedToInternet
+        do {
+            if Connectivity.isConnectedToInternet {
+                getCity(city: "Ha Noi")
+                lblError.text = "The next 7 days"
+                self.tableView.reloadData()
+            } else {
+                clearData()
+            }
+        }
+    }
+    func clearData(){
+        lblError.text = "No Internet, try again!"
+        self.weatherList.removeAll()
+         self.tableView.reloadData()
     }
     
     func customTable(){
@@ -43,7 +59,7 @@ class DaysViewController: UIViewController, UISearchBarDelegate, NVActivityIndic
     }
     
     func getCity(city: String){
-        Helper.fetchDay(city: city) { [weak self] weatherDay in
+        Helper.fetchDay(city: city) { [weak self] success, weatherDay in
             self?.weatherList = weatherDay
             DispatchQueue.main.async {
                 self?.tableView.reloadData()

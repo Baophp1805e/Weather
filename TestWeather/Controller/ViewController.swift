@@ -19,7 +19,6 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
     @IBOutlet weak var lblPlace: UILabel!
     @IBOutlet weak var imgMain: UIImageView!
     @IBOutlet weak var currentTime: UILabel!
-    
     @IBOutlet weak var lblError: UILabel!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var lblTime: UILabel!
@@ -27,10 +26,9 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
     @IBOutlet weak var lblTemp: UILabel!
     @IBOutlet weak var searchBar: UISearchBar!
     var weatherModel: Weather?
-//    let id = 1562822
-//    let apiKey = "8c1e240150949fb7bfe0bf0503c8a20e"
     var weather = [Weather]()
-    
+    var refreshControl = UIRefreshControl()
+    //MARK: Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
 //        tableView.headerView(forSection: 1)
@@ -39,13 +37,19 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
         searchBar.delegate = self
         // Do any additional setup after loading the view, typically from a nib.
         tableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "tempCell")
-        //        updateImage()
-        request(city: "Ha Noi")
-        let date = Date()
-        let format = DateFormatter()
-        format.dateFormat = "yyyy-MM-dd HH:mm"
-        let formattedDate = format.string(from: date)
-        currentTime.text = formattedDate
+        refreshTablebiew()
+    }
+    
+    //MARK: Handling
+    
+    func refreshTablebiew(){
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControl.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
+        tableView.addSubview(refreshControl)
+    }
+    @objc func refresh(sender:AnyObject) {
+            request(city: "Ha Noi")
+        
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if !searchText.isEmpty {
@@ -55,35 +59,76 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
         }
         
     }
-    
-    
+    override func viewWillAppear(_ animated: Bool) {
+        let _ = Connectivity.isConnectedToInternet
+        do {
+                if Connectivity.isConnectedToInternet {
+                    request(city: "Ha Noi")
+                    let date = Date()
+                    let format = DateFormatter()
+                    format.dateFormat = "yyyy-MM-dd HH:mm"
+                    let formattedDate = format.string(from: date)
+                    currentTime.text = formattedDate
+                    lblError.text = "3 day forecast"
+                    self.tableView.reloadData()
+                } else {
+                    clearData()
+                }
+        }
+    }
+    func clearData(){
+        let a = "No Internet,try again!"
+        let b = ""
+        lblError.text = a
+        currentTime.text = b
+        imgMain.image = UIImage(named: "don't_know")
+        self.lblTime.text = ""
+        self.lblPlace.text = ""
+        self.lblClounds.text = ""
+        self.lblTemp.text = ""
+        self.weather.removeAll()
+        self.tableView.reloadData()
+    }
     func request(city:String){
         
         let size = CGSize(width: 30, height: 30)
         self.startAnimating(size, message: "Loading", type: NVActivityIndicatorType.ballRotateChase, fadeInAnimation: nil)
-        Helper.requestAPI(city: city) { [ weak self] weather in
-            DispatchQueue.main.async {
-                self!.lblTime.text = weather.day
-                self!.lblPlace.text = weather.name
-                self!.lblClounds.text = weather.main
-                self!.updateImage(text: weather.main!)
-                
-                self!.lblTemp.text = weather.temp! + " °C"
+        Helper.callAPI(city: city) { [weak self] success, weather in
+            guard let `self` = self else {return}
+            self.refreshControl.endRefreshing()
+            if success {
+                DispatchQueue.main.async {
+                    self.lblTime.text = weather.day
+                    self.lblPlace.text = weather.name
+                    self.lblClounds.text = weather.main
+                    self.updateImage(text: weather.main!)
+                    self.lblTemp.text = weather.temp! + " °C"
+                    let date = Date()
+                    let format = DateFormatter()
+                    format.dateFormat = "yyyy-MM-dd HH:mm"
+                    let formattedDate = format.string(from: date)
+                    self.currentTime.text = formattedDate
+                    self.lblError.text = "3 day forecast"
+                    self.stopAnimating()
+                }
+            } else {
+                self.stopAnimating()
+                print("Error")
+            }
+            
+        }
+        Helper.fetchJson(city: city) { [weak self] success, weatherList in
+            if success {
+                self?.weather = weatherList
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                    self!.stopAnimating()
+                }
+            } else {
+                self!.stopAnimating()
+                print("Error")
             }
         }
-        Helper.fetchJson(city: city) { [weak self] weatherList in
-            self?.weather = weatherList
-            DispatchQueue.main.async {
-                self?.tableView.reloadData()
-            }
-        }
-//        Helper.fetchDay(city: city) { [weak self] weatherDay in
-//            self?.weather = weatherDay
-//            DispatchQueue.main.async {
-//                self?.tableView.reloadData()
-//            }
-//        }
-        self.stopAnimating()
     }
     
     func updateImage(text:String) {
