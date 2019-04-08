@@ -11,6 +11,7 @@ import Alamofire
 import SwiftyJSON
 import NVActivityIndicatorView
 //import CoreLocation
+import RealmSwift
 
 class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicatorViewable {
     
@@ -25,112 +26,165 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
     @IBOutlet weak var lblClounds: UILabel!
     @IBOutlet weak var lblTemp: UILabel!
     @IBOutlet weak var searchBar: UISearchBar!
-    var weatherModel: Weather?
-    var weather = [Weather]()
+    var currentWeather: CurrentWeather?
+    let realm = try! Realm()
+    var weatherList = [HourWeather]()
+    
     var refreshControl = UIRefreshControl()
+    
     //MARK: Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-//        tableView.headerView(forSection: 1)
-        tableView.delegate = self
-        tableView.dataSource = self
-        searchBar.delegate = self
-        // Do any additional setup after loading the view, typically from a nib.
-        tableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "tempCell")
-        refreshTablebiew()
+        self.setupTableView()
+        print(Realm.Configuration.defaultConfiguration.fileURL!)
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.checkOffline()
     }
     
     //MARK: Handling
     
+    func setupTableView(){
+        tableView.delegate = self
+        tableView.dataSource = self
+        searchBar.delegate = self
+        tableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "tempCell")
+        refreshTablebiew()
+    }
+    
+    //MARK: Pull to refresh
     func refreshTablebiew(){
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refreshControl.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         tableView.addSubview(refreshControl)
     }
     @objc func refresh(sender:AnyObject) {
-            request(city: "Ha Noi")
-        
+        self.getCurrentWeatherAPI(forName: "Ha Noi")
+        self.getHourWeatherAPI(forName: "Ha Noi")
+        checkOffline()
     }
+    
+    //MARK: Searching city
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if !searchText.isEmpty {
-            request(city: searchText)
+            self.getCurrentWeatherAPI(forName: searchText)
+            self.getHourWeatherAPI(forName: searchText)
         } else {
-            request(city: "Ha Noi")
+            self.getCurrentWeatherAPI(forName: "Ha Noi")
+            self.getHourWeatherAPI(forName: "Ha Noi")
         }
         
     }
-    override func viewWillAppear(_ animated: Bool) {
+   
+    //MARK: Checking Internet
+    func checkOffline(){
         let _ = Connectivity.isConnectedToInternet
         do {
-                if Connectivity.isConnectedToInternet {
-                    request(city: "Ha Noi")
-                    let date = Date()
-                    let format = DateFormatter()
-                    format.dateFormat = "yyyy-MM-dd HH:mm"
-                    let formattedDate = format.string(from: date)
-                    currentTime.text = formattedDate
-                    lblError.text = "3 day forecast"
-                    self.tableView.reloadData()
-                } else {
-                    clearData()
-                }
+            if Connectivity.isConnectedToInternet {
+//                searchBar.isHidden = false
+                let size = CGSize(width: 30, height: 30)
+                self.startAnimating(size, message: "Loading", type: NVActivityIndicatorType.ballRotateChase, fadeInAnimation: nil)
+                self.getCurrentWeatherAPI(forName: "Ha Noi")
+                self.getHourWeatherAPI(forName: "Ha Noi")
+                self.lblError.text = "3 day Forecast"
+                self.stopAnimating()
+            } else {
+//                searchBar.isHidden = true
+                self.lblError.text = "No Internet, try again!"
+                self.getCurrentWeatherCache()
+                self.getHourWeatherCache()
+            }
         }
     }
-    func clearData(){
-        let a = "No Internet,try again!"
-        let b = ""
-        lblError.text = a
-        currentTime.text = b
-        imgMain.image = UIImage(named: "don't_know")
-        self.lblTime.text = ""
-        self.lblPlace.text = ""
-        self.lblClounds.text = ""
-        self.lblTemp.text = ""
-        self.weather.removeAll()
-        self.tableView.reloadData()
-    }
-    func request(city:String){
-        
-        let size = CGSize(width: 30, height: 30)
-        self.startAnimating(size, message: "Loading", type: NVActivityIndicatorType.ballRotateChase, fadeInAnimation: nil)
-        Helper.callAPI(city: city) { [weak self] success, weather in
+    
+    //MARK: GetCurrentWeatherAPI
+    func getCurrentWeatherAPI(forName city: String){
+        Helper.getCurrentWeatherAPI(forName: city) { [weak self] success, weather in
             guard let `self` = self else {return}
             self.refreshControl.endRefreshing()
             if success {
                 DispatchQueue.main.async {
-                    self.lblTime.text = weather.day
-                    self.lblPlace.text = weather.name
-                    self.lblClounds.text = weather.main
-                    self.updateImage(text: weather.main!)
-                    self.lblTemp.text = weather.temp! + " °C"
-                    let date = Date()
-                    let format = DateFormatter()
-                    format.dateFormat = "yyyy-MM-dd HH:mm"
-                    let formattedDate = format.string(from: date)
-                    self.currentTime.text = formattedDate
-                    self.lblError.text = "3 day forecast"
-                    self.stopAnimating()
+                    self.currentWeather = weather
+                    self.setupTopView()
+                    self.saveCurrentWeatherCache(weather: self.currentWeather!)
                 }
             } else {
-                self.stopAnimating()
-                print("Error")
-            }
-            
-        }
-        Helper.fetchJson(city: city) { [weak self] success, weatherList in
-            if success {
-                self?.weather = weatherList
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self!.stopAnimating()
-                }
-            } else {
-                self!.stopAnimating()
                 print("Error")
             }
         }
     }
     
+    //MARK: Handle View CurrentWeatherAPI
+    func setupTopView(){
+        self.lblTime.text = currentWeather!.time
+        self.lblPlace.text = currentWeather!.name
+        self.lblClounds.text = currentWeather!.main
+        self.updateImage(text: currentWeather!.main!)
+        self.lblTemp.text = currentWeather!.temp! + " °C"
+        let date = Date()
+        let format = DateFormatter()
+        format.dateFormat = "yyyy-MM-dd HH:mm"
+        let formattedDate = format.string(from: date)
+        self.currentTime.text = formattedDate
+//        self.lblError.text = "3 day forecast"
+    }
+    
+    //MARK: GetHourWeatherAPI
+    func getHourWeatherAPI(forName city: String){
+        Helper.getWeatherListHourAPI(forName: city) { [weak self] success, weatherList in
+            guard let `self` = self else {return}
+            self.refreshControl.endRefreshing()
+            if success {
+                self.weatherList = weatherList
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+                self.saveWeatherListHourCache(weather: self.weatherList)
+            } else {
+                self.stopAnimating()
+                print("Error")
+            }
+        }
+    }
+    
+    //MARK: Realm
+    func saveWeatherListHourCache(weather: [HourWeather]){
+        let item = realm.objects(RlmHourWeather.self)
+        try! realm.write() {
+            self.realm.delete(item)
+        }
+        weatherList.forEach({ (weather) in
+            try! realm.write() {
+                self.realm.add(weather.toRealm())
+            }
+        })
+    }
+    
+    func saveCurrentWeatherCache(weather: CurrentWeather){
+        let item = realm.objects(RlmCurrentWeather.self)
+        try! realm.write() {
+            self.realm.delete(item)
+            self.realm.add(weather.toRealm())
+        }
+    }
+   
+    func getCurrentWeatherCache(){
+        guard let item = realm.objects(RlmCurrentWeather.self).first else {return}
+        self.currentWeather = item.toModel()
+        self.setupTopView()
+    }
+    
+    func getHourWeatherCache(){
+        let items = realm.objects(RlmHourWeather.self)
+        for item in items {
+            self.weatherList.append(item.toModel())
+        }
+        self.tableView.reloadData()
+    }
+    
+    //MARK: Updating image
     func updateImage(text:String) {
         switch text {
         case "Sunny":
@@ -155,7 +209,6 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
             self.imgMain.image = UIImage(named: "fog")
         case "Haze":
             self.imgMain.image = UIImage(named: "fog")
-//            break
         default:
             self.imgMain.image = UIImage(named: "don't_know")
         }
@@ -163,16 +216,15 @@ class ViewController: UIViewController, UISearchBarDelegate, NVActivityIndicator
     
 }
 
+//MARK: Collection Views
 extension ViewController:UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.weather.count
+        return self.weatherList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tempCell", for: indexPath) as! TableViewCell
-        cell.bindData(wether: weather[indexPath.row])
-
-        
+        cell.bindData(wether: weatherList[indexPath.row])
         return cell
     }
     

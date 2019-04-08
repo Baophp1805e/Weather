@@ -26,8 +26,12 @@ class TableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func bindData(wether:Weather) {
-        lblDay.text = wether.day
+    func bindData(wether:HourWeather) {
+        let date = Date(timeIntervalSince1970: Double(wether.day!))
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEEE"
+        let day = dateFormatter.string(from: date)
+        lblDay.text = day
         lblTime.text = wether.time
         lblTemp.text = wether.temp
         

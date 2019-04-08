@@ -17,7 +17,12 @@
 		3931CA732243484700BEF689 /* TestWeatherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3931CA722243484700BEF689 /* TestWeatherUITests.swift */; };
 		39796C9B224478950036A111 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39796C99224478950036A111 /* TableViewCell.swift */; };
 		39796C9C224478950036A111 /* TableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 39796C9A224478950036A111 /* TableViewCell.xib */; };
-		39796C9E22447B9B0036A111 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39796C9D22447B9B0036A111 /* Weather.swift */; };
+		398574DC2257471E00C42AEB /* CurrentWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398574DB2257471E00C42AEB /* CurrentWeather.swift */; };
+		398574DE2257473400C42AEB /* HourWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398574DD2257473400C42AEB /* HourWeather.swift */; };
+		398574E02257474300C42AEB /* DayWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398574DF2257474300C42AEB /* DayWeather.swift */; };
+		398574E22257482A00C42AEB /* RlmCurrentWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398574E12257482A00C42AEB /* RlmCurrentWeather.swift */; };
+		398574E422574A6200C42AEB /* RlmHourWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398574E322574A6200C42AEB /* RlmHourWeather.swift */; };
+		398574E622574B5D00C42AEB /* RlmDayWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398574E522574B5D00C42AEB /* RlmDayWeather.swift */; };
 		399B497E224C6BE300F4E268 /* DayTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 399B497C224C6BE300F4E268 /* DayTableViewCell.swift */; };
 		399B497F224C6BE300F4E268 /* DayTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 399B497D224C6BE300F4E268 /* DayTableViewCell.xib */; };
 		399B4981224C719300F4E268 /* DaysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 399B4980224C719300F4E268 /* DaysViewController.swift */; };
@@ -59,7 +64,12 @@
 		3931CA742243484700BEF689 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		39796C99224478950036A111 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		39796C9A224478950036A111 /* TableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewCell.xib; sourceTree = "<group>"; };
-		39796C9D22447B9B0036A111 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
+		398574DB2257471E00C42AEB /* CurrentWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeather.swift; sourceTree = "<group>"; };
+		398574DD2257473400C42AEB /* HourWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourWeather.swift; sourceTree = "<group>"; };
+		398574DF2257474300C42AEB /* DayWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayWeather.swift; sourceTree = "<group>"; };
+		398574E12257482A00C42AEB /* RlmCurrentWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RlmCurrentWeather.swift; sourceTree = "<group>"; };
+		398574E322574A6200C42AEB /* RlmHourWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RlmHourWeather.swift; sourceTree = "<group>"; };
+		398574E522574B5D00C42AEB /* RlmDayWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RlmDayWeather.swift; sourceTree = "<group>"; };
 		399B497C224C6BE300F4E268 /* DayTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTableViewCell.swift; sourceTree = "<group>"; };
 		399B497D224C6BE300F4E268 /* DayTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DayTableViewCell.xib; sourceTree = "<group>"; };
 		399B4980224C719300F4E268 /* DaysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaysViewController.swift; sourceTree = "<group>"; };
@@ -139,6 +149,7 @@
 			children = (
 				3931CA522243484400BEF689 /* AppDelegate.swift */,
 				3990F2A52243975400C66213 /* Model */,
+				398574DA2257469C00C42AEB /* RlmModel */,
 				39B31AD8224E01CE00CDF5FC /* View */,
 				39B31AD7224DF10B00CDF5FC /* Controller */,
 				399B497B224C6BC200F4E268 /* Cell Days */,
@@ -177,10 +188,22 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
+		398574DA2257469C00C42AEB /* RlmModel */ = {
+			isa = PBXGroup;
+			children = (
+				398574E12257482A00C42AEB /* RlmCurrentWeather.swift */,
+				398574E322574A6200C42AEB /* RlmHourWeather.swift */,
+				398574E522574B5D00C42AEB /* RlmDayWeather.swift */,
+			);
+			path = RlmModel;
+			sourceTree = "<group>";
+		};
 		3990F2A52243975400C66213 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				39796C9D22447B9B0036A111 /* Weather.swift */,
+				398574DB2257471E00C42AEB /* CurrentWeather.swift */,
+				398574DD2257473400C42AEB /* HourWeather.swift */,
+				398574DF2257474300C42AEB /* DayWeather.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -381,12 +404,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				39796C9B224478950036A111 /* TableViewCell.swift in Sources */,
+				398574E22257482A00C42AEB /* RlmCurrentWeather.swift in Sources */,
+				398574E622574B5D00C42AEB /* RlmDayWeather.swift in Sources */,
 				3931CA552243484400BEF689 /* ViewController.swift in Sources */,
 				399B4981224C719300F4E268 /* DaysViewController.swift in Sources */,
 				39083CEF224B2D8E007D0B01 /* Helper.swift in Sources */,
-				39796C9E22447B9B0036A111 /* Weather.swift in Sources */,
+				398574E02257474300C42AEB /* DayWeather.swift in Sources */,
+				398574E422574A6200C42AEB /* RlmHourWeather.swift in Sources */,
 				399B497E224C6BE300F4E268 /* DayTableViewCell.swift in Sources */,
+				398574DE2257473400C42AEB /* HourWeather.swift in Sources */,
 				39A5E1CA22519C0F00266996 /* checkingInternet.swift in Sources */,
+				398574DC2257471E00C42AEB /* CurrentWeather.swift in Sources */,
 				3931CA532243484400BEF689 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

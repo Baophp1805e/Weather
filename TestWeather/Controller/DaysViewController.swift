@@ -10,37 +10,44 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 import NVActivityIndicatorView
+import RealmSwift
 
 class DaysViewController: UIViewController, UISearchBarDelegate, NVActivityIndicatorViewable {
     
-    var weatherList = [Weather]()
-    
+    //MARK: Properties
+    var dayWeatherList = [DayWeather]()
+    let realm = try! Realm()
+   
     @IBOutlet weak var searchBar: UISearchBar!
-    
     @IBOutlet weak var lblError: UILabel!
     @IBOutlet weak var tableView: UITableView!
+    
+    //MARK: Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupView()
+    }
+    
+    func setupView(){
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
-        // Do any additional setup after loading the view.
         tableView.register(UINib(nibName: "DayTableViewCell", bundle: nil), forCellReuseIdentifier: "dayCell")
-//        getCity(city: "Ha Noi")
-//        activityIndicatorView.startAnimating()
     }
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if !searchText.isEmpty{
-            getCity(city: searchText)
+            getWeatherListDayAPI(city: searchText)
         } else {
-            getCity(city: "Ha Noi")
+            getWeatherListDayAPI(city : "Ha Noi")
         }
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         let _ = Connectivity.isConnectedToInternet
         do {
             if Connectivity.isConnectedToInternet {
-                getCity(city: "Ha Noi")
+                getWeatherListDayAPI(city: "Ha Noi")
                 lblError.text = "The next 7 days"
                 self.tableView.reloadData()
             } else {
@@ -48,37 +55,56 @@ class DaysViewController: UIViewController, UISearchBarDelegate, NVActivityIndic
             }
         }
     }
+    
     func clearData(){
         lblError.text = "No Internet, try again!"
-        self.weatherList.removeAll()
-         self.tableView.reloadData()
+        self.dayWeatherList.removeAll()
+        self.tableView.reloadData()
+        getCacheData()
     }
     
-    func customTable(){
-//        NVActivityIndicatorView(frame: frame, type: type, color: color, padding: padding)
-    }
-    
-    func getCity(city: String){
-        Helper.fetchDay(city: city) { [weak self] success, weatherDay in
-            self?.weatherList = weatherDay
+    func getWeatherListDayAPI(city: String){
+        Helper.getWeatherListDayAPI(forName: city) { [weak self] success, weatherDay in
+             guard let `self` = self else {return}
+            self.dayWeatherList = weatherDay
+            //Realm
+           self.saveWeatherListDayCache(weather: self.dayWeatherList)
             DispatchQueue.main.async {
-                self?.tableView.reloadData()
+                self.tableView.reloadData()
             }
+            
         }
     }
-     //func searchBar(city: String, textDidChange)
-
+    //MARK: Realm
+    func saveWeatherListDayCache(weather: [DayWeather]){
+        let item = self.realm.objects(RlmDayWeather.self)
+        try! self.realm.write() {
+            self.realm.delete(item)
+        }
+        dayWeatherList.forEach({ (weather) in
+            try! self.realm.write() {
+                self.realm.add(weather.toRealm())
+            }
+        })
+    }
+    func getCacheData(){
+        let infors = self.realm.objects(RlmDayWeather.self)
+        for infor in infors{
+            self.dayWeatherList.append(infor.toModel())
+        } 
+        self.tableView.reloadData()
+    }
 }
 
+//MARK: Collection Views
 extension DaysViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.weatherList.count
-        
+        return self.dayWeatherList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "dayCell", for: indexPath) as! DayTableViewCell
-        let data = weatherList[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "dayCell", for: indexPath) as! DayTableViewCell       
+        let data = dayWeatherList[indexPath.row]
         cell.setData(weather: data)
         return cell
     }

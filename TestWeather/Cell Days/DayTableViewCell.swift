@@ -26,12 +26,19 @@ class DayTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-    func setData(weather: Weather){
-        lblDay.text = weather.day
-        lblMax.text = weather.temMax! + " °C"
-        lblMin.text = weather.tempMin! + " °C"
-        lblMain.text = weather.main
-        updateImage(text: weather.main!)
+    
+    func setData(weather: DayWeather){
+        
+        
+        if weather.tempMax != nil{
+            lblDay.text = weather.day
+            lblMain.text = weather.main
+            updateImage(text: weather.main!)
+            lblMax.text = weather.tempMax! + " °C"
+            lblMin.text = weather.tempMin! + " °C"
+        }
+        
+        
     }
     
 
